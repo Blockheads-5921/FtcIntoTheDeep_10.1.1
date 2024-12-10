@@ -9,8 +9,9 @@ import org.firstinspires.ftc.teamcode.TankDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
 import org.firstinspires.ftc.teamcode.TwoDeadWheelLocalizer;
 
-public final class ManualFeedbackTuner extends LinearOpMode {
-    public static double DISTANCE = 64;
+public final class
+ManualFeedbackTuner extends LinearOpMode {
+    public static double DISTANCE = 60;
 
     @Override
     public void runOpMode() throws InterruptedException {
