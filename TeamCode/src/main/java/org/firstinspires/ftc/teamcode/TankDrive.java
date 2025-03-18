@@ -180,7 +180,7 @@ public final class TankDrive {
             meanRightVel /= rightEncs.size();
 
             FlightRecorder.write("TANK_LOCALIZER_INPUTS",
-                     new TankLocalizerInputsMessage(leftReadings, rightReadings));
+                    new TankLocalizerInputsMessage(leftReadings, rightReadings));
 
             if (!initialized) {
                 initialized = true;
@@ -195,11 +195,11 @@ public final class TankDrive {
             }
 
             TankKinematics.WheelIncrements<Time> twist = new TankKinematics.WheelIncrements<>(
-                    new DualNum<Time>(new double[] {
+                    new DualNum<Time>(new double[]{
                             meanLeftPos - lastLeftPos,
                             meanLeftVel
                     }).times(PARAMS.inPerTick),
-                    new DualNum<Time>(new double[] {
+                    new DualNum<Time>(new double[]{
                             meanRightPos - lastRightPos,
                             meanRightVel,
                     }).times(PARAMS.inPerTick)
@@ -224,8 +224,8 @@ public final class TankDrive {
         // TODO: make sure your config has motors with these names (or change them)
         //   add additional motors on each side if you have them
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        leftMotors = Arrays.asList(hardwareMap.get(DcMotorEx.class, "left"));
-        rightMotors = Arrays.asList(hardwareMap.get(DcMotorEx.class, "right"));
+        leftMotors = Collections.singletonList(hardwareMap.get(DcMotorEx.class, "left"));
+        rightMotors = Collections.singletonList(hardwareMap.get(DcMotorEx.class, "right"));
 
         for (DcMotorEx m : leftMotors) {
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -407,7 +407,7 @@ public final class TankDrive {
                     Vector2dDual.constant(new Vector2d(0, 0), 3),
                     txWorldTarget.heading.velocity().plus(
                             PARAMS.turnGain * pose.heading.minus(txWorldTarget.heading.value()) +
-                            PARAMS.turnVelGain * (robotVelRobot.angVel - txWorldTarget.heading.velocity().value())
+                                    PARAMS.turnVelGain * (robotVelRobot.angVel - txWorldTarget.heading.velocity().value())
                     )
             );
             driveCommandWriter.write(new DriveCommandMessage(command));

@@ -31,25 +31,19 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Trajectory;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-
-@Autonomous(name = "Red_f4", group = "Autonomous")
-public class Red_F4 extends LinearOpMode {
+@Disabled
+@Autonomous(name = "Red_f4_acku", group = "Autonomous")
+public class Red_F4_Backup extends LinearOpMode {
 
     public void setLifterBoom(DcMotor boom, DcMotor lifter, int boomVal, int lifterVal) {
         lifter.setTargetPosition(lifterVal);
@@ -60,9 +54,9 @@ public class Red_F4 extends LinearOpMode {
 
     public void setLifterBoomAndWait(DcMotor boom, DcMotor lifter, int boomVal, int lifterVal) {
         lifter.setTargetPosition(lifterVal);
-        lifter.setPower(1);
+        lifter.setPower(.45);
         boom.setTargetPosition(boomVal);
-        boom.setPower(1);
+        boom.setPower(.45);
         while (boom.isBusy() || lifter.isBusy()){}
     }
     @Override
@@ -88,7 +82,7 @@ public class Red_F4 extends LinearOpMode {
 
         final double GRAB = 0.55;
         final double RELEASE =0.3;
-        final double waitTime = 1.0;
+        final double waitTime = 0.250;
 
 
 
@@ -107,32 +101,27 @@ public class Red_F4 extends LinearOpMode {
                 .lineToY(-15)
                 .splineToConstantHeading(new Vector2d(47,-15), Math.toRadians(-90))
                 .lineToY(-59, new TranslationalVelConstraint(60))
-                .splineToConstantHeading(new Vector2d(47,-59), Math.toRadians(90))
-                //.lineToY(-46)
+
                 // Go back and push the middle strike
-                //.lineToY(-15)  //************************************************
-                //.splineToConstantHeading(new Vector2d(57,-15), Math.toRadians(-90))  //*************
-                //.lineToY(-59, new TranslationalVelConstraint(60))  //***************************
-
-                .build();
-
-        Action Grab_clip = drive.actionBuilder(new Pose2d(47, -59, Math.toRadians(-90)))
+                .lineToY(-15)
+                .splineToConstantHeading(new Vector2d(57,-15), Math.toRadians(-90))
+                .lineToY(-59, new TranslationalVelConstraint(60))
+                .lineToY(-45)
                 .lineToY(-46)
                 .build();
 
-        Action move_away_from_wall = drive.actionBuilder(new Pose2d(47,-46, Math.toRadians(-90)))  //**
-                //.waitSeconds(1)
+        Action move_away_from_wall = drive.actionBuilder(new Pose2d(57,-46, Math.toRadians(-90)))
                 .splineToConstantHeading(new Vector2d(38,-46),Math.toRadians(10))
-                .build(); //May not have to move away from the wall
+                .build();
 
         //Clip strike 1
         Action clipStrike1 = drive.actionBuilder( new Pose2d(38, -46, Math.toRadians(10)))
                 .setReversed(true)
-                .splineTo(new Vector2d(-3,-49), Math.toRadians(-81))  //clip onto bar & open clamp
+                .splineTo(new Vector2d(-3,-57.5), Math.toRadians(-81))  //clip onto bar & open clamp
                 .setReversed(false)
                 //.splineTo(new Vector2d(5,-40), Math.toRadians(-180))
-                .lineToY(-41)
-                //.lineToY(-57)
+                .lineToY(-40)
+                .lineToY(-57)
                 .build();
 
         //Push strike 3
@@ -164,9 +153,9 @@ public class Red_F4 extends LinearOpMode {
                 .build();
 
         //Park at the of autonomous
-        Action park = drive.actionBuilder( new Pose2d(-3, -41, Math.toRadians(90)))  //***
+        Action park = drive.actionBuilder( new Pose2d(5, -43, Math.toRadians(90)))
                 .waitSeconds(0.5)
-                .splineTo(new Vector2d(40,-61), Math.toRadians(0))//park it
+                .splineTo(new Vector2d(40,-50), Math.toRadians(0))//park it
                 .build();
 
         Action delay1 = drive.actionBuilder(new Pose2d(0, 0, 90))
@@ -183,17 +172,7 @@ public class Red_F4 extends LinearOpMode {
 
         Action waitForIT = drive.actionBuilder(new Pose2d(0,0,0))
                 .waitSeconds(waitTime)
-                //.lineToY(-46)
                 .build();
-        Action waitForIT_two = drive.actionBuilder(new Pose2d(0,0,0))
-                .waitSeconds(waitTime)
-                .build();
-
-        Action back_up = drive.actionBuilder(new Pose2d(-3,-45, Math.toRadians(-90)))
-                .lineToY(-45)
-                .build();
-
-
 
         waitForStart();//wait to start
 
@@ -210,30 +189,22 @@ public class Red_F4 extends LinearOpMode {
 
         //Go push strike 1 and 2 and grab strike 1
         Actions.runBlocking(pushStrike1and2);
-        //Actions.runBlocking(Grab_clip);
-        //setLifterBoom(boom, lifter, 100, 560);//get ready clamp strike 1
-        //while (boom.isBusy() || lifter.isBusy()){}
+        setLifterBoom(boom, lifter, 481, 3170);//get ready clamp strike 1
+        while (boom.isBusy() || lifter.isBusy()){}
 
-        //clamp.setPosition(GRAB);
-        //Actions.runBlocking(waitForIT);
-        //Actions.runBlocking(waitForIT);
-
+        clamp.setPosition(GRAB);
+        Actions.runBlocking(waitForIT);
 
         //Go clip strike 1
-        //setLifterBoom(boom, lifter, 281, 1095);
-        //Actions.runBlocking(waitForIT_two);
+        setLifterBoom(boom, lifter, 281, 1075);
+        Actions.runBlocking(waitForIT);
         //while (boom.isBusy() || lifter.isBusy()){ }
-        //Actions.runBlocking(move_away_from_wall);
-        //Actions.runBlocking(clipStrike1);
-        //setLifterBoom(boom, lifter, 300, 1025);
-        //Actions.runBlocking(back_up);
+        Actions.runBlocking(move_away_from_wall);
+        Actions.runBlocking(clipStrike1);
+        //setLifterBoom(boom, lifter, 295, 1300);
         //while (boom.isBusy() || lifter.isBusy()){}
-        //Thread.sleep(500);
-        //clamp.setPosition(RELEASE);
+        clamp.setPosition(RELEASE);
 
-
-        //Go park
-        Actions.runBlocking(park);  //************************************************************
 
 /*        //Go push strike 3
         Actions.runBlocking(pushStrike3);

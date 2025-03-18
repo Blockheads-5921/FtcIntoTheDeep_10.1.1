@@ -29,8 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.provider.Settings;
-
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -72,12 +71,12 @@ import org.slf4j.LoggerFactory;
  * d line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name = "BasicOpMode_Linear", group = "Linear OpMode")
+@TeleOp(name = "ClimbTGest", group = "Linear OpMode")
+@Disabled
+public class ClimbTest extends LinearOpMode {
 
-public class BasicOmniOpMode_Linear extends LinearOpMode {
 
-
-    static final Logger log = LoggerFactory.getLogger(BasicOmniOpMode_Linear.class);
+    static final Logger log = LoggerFactory.getLogger(ClimbTest.class);
 
     // Declare OpMode members for each of the 4 motors.
     private final ElapsedTime runtime = new ElapsedTime();
@@ -194,210 +193,25 @@ public class BasicOmniOpMode_Linear extends LinearOpMode {
         int diff = 0;
 
         waitForStart();
+
         startTime = System.currentTimeMillis();
         runtime.reset();
-        while (opModeIsActive()) {
-            double max = 0.0;
-            //set power to full or half power for drive motors
-            if (!halfPowerLock && gamepad1.right_bumper) {
-                halfPowerLock = true;
-                if (halfPower == 1.0) {
-                    halfPower = 0.5;
-                } else if (halfPower == 0.5) {
-                    halfPower = 1.0;
-                }
-            } else if (halfPowerLock && !gamepad1.right_bumper) {
-                halfPowerLock = false;
-            }
-
-            // Input servo
-            //
-
-            if (gamepad2.right_bumper) {
-                log.info("Right bumper - Grip");
-                particleInOut.setPosition(0.55);  //Grip position
-            } else if (gamepad2.left_bumper) {
-                log.info("Left bumper - Release");
-                particleInOut.setPosition(0.3);  //Open position
-            }
-
-            //diagnostic info
-            telemetry.addData("Lifter Encoder ", lifter.getCurrentPosition());
-            telemetry.addData("Boom Encoder", boom.getCurrentPosition());
-            telemetry.addData("Low Climb Encoder ", lowclimb.getCurrentPosition());
-            telemetry.addData("High Climb Encoder ", highclimb.getCurrentPosition());
-
-
-            //Go to safe position
+       
             if (gamepad2.dpad_up) {
                 log.info("dpadup pressed - ligter " + lifter.isBusy() + ", boom " + boom.isBusy() + ", boom pos " + boom.getCurrentPosition() + ", dpadUpLock " + dpadUpLock);
             }
             if (gamepad2.dpad_up && !dpadUpLock) {//Ok, now go to safe mode
                 dpadUpLock = true;
                 log.info("Safe Mode: boom position = " + boom.getCurrentPosition());
-                lifter.setTargetPosition(560);
+                lifter.setTargetPosition(-560);
                 lifter.setPower(0.5);
                 boom.setTargetPosition(100);
                 boom.setPower(.99);
             } else if (!gamepad2.dpad_up && dpadUpLock && !lifter.isBusy() && !boom.isBusy()) {
                 dpadUpLock = false;
             }
-
-            //Specimen top bar position
-            if (gamepad2.x) {
-                log.info("FTCRobot -- X pressed, Lifter " + lifter.isBusy() + ", Boom " + boom.isBusy() + ",  topBarLock " + topBarLock);
-            }
-            if (gamepad2.x && !topBarLock && !lifter.isBusy() && !boom.isBusy()) {
-                log.info("Top bar, hang specimen");
-                topBarLock = true;
-                boom.setTargetPosition(281);
-                boom.setPower(0.99);
-                lifter.setTargetPosition(1100);
-                lifter.setPower(0.45);
-            } else if (!gamepad2.x && topBarLock && !lifter.isBusy() && !boom.isBusy()) {
-                topBarLock = false;
-            }
-
-            //Set 24" position
-            if (gamepad2.dpad_down) {
-                log.info("FTCRobot -- dpad_down pressed, Lifter " + lifter.isBusy() + ", Boom " + boom.isBusy() + ",  dpadDownLock " + dpadDownLock);
-            }
-            if (gamepad2.dpad_down && !dpadDownLock) {
-                dpadDownLock = true;
-                log.info("FTCRobot -- 24 inch section");
-                lifter.setTargetPosition(490);
-                lifter.setPower(0.2);
-                boom.setTargetPosition(2300);
-                boom.setPower(.99);
-            } else if (!gamepad2.dpad_down && dpadDownLock && !lifter.isBusy() && !boom.isBusy()) {
-                lifter.setTargetPosition(297);
-                lifter.setPower(.75);
-                dpadDownLock = false;
-            }
-
-            //High basket
-            if (gamepad2.dpad_right) {
-                log.info("FTCRobot -- dpad_right pressed, Lifter  " + lifter.isBusy() + ", Boom " + boom.isBusy() + ",  dpadHighLock " + dpadHighLock);
-            }
-            if (gamepad2.dpad_right && !dpadHighLock) {
-                log.info("High basket");
-                dpadHighLock = true;
-                lifter.setTargetPosition(1520);
-                lifter.setPower(0.99);
-                boom.setTargetPosition(2200);
-                boom.setPower(.99);
-            } else if (!gamepad2.dpad_right && dpadHighLock && !lifter.isBusy() && !boom.isBusy()) {
-                dpadHighLock = false;
-            }
-
-            //Position lifter for climb to low bar
- /*           if (gamepad2.a) {
-                log.info("FTCRobot -- A button pressed, Lifter " + lifter.isBusy() + ", Boom " + boom.isBusy() + ",  positionForClimbLock " + positionForClimbLock);
-            }
-           if (gamepad2.a && !positionForClimbLock && !lifter.isBusy() && !boom.isBusy()) {
-                log.info("Position for climb");
-                positionForClimbLock = true;
-                boom.setTargetPosition(100);
-                boom.setPower(.45);
-                lifter.setTargetPosition(1960);
-                lifter.setPower(0.45);
-            } else if (!gamepad2.a && positionForClimbLock && !lifter.isBusy() && !boom.isBusy()) {
-                positionForClimbLock = false;
-            }
-            telemetry.addData("Start time: ", startTime / 1000);
-            telemetry.addData("Current time: ", System.currentTimeMillis() / 1000);
-            if (((System.currentTimeMillis() - startTime) / 1000) > 90) { //prohibit climbing untill last 30 seconds
-                // Climb to low bar
-                if (gamepad2.b) {
-                    log.info("FTCRobot -- B pressed, Lifter " + lifter.isBusy() + ", Boom " + boom.isBusy() + ",  startClimbLock " + startClimbLock);
-                }
-                if (gamepad2.b && !startClimbLock) {
-                    log.info("Low bar climb");
-                    startClimbLock = true;
-                    lowclimb.setTargetPosition(7600);
-                    lowclimb.setPower(10.0);
-                }
-
-                //Move lifter during climb to low bar so that is does not hit the floor
-                if (startClimbLock && (lowclimb.getCurrentPosition() > 5600) && !lowClimbLock) {
-                    lowClimbLock = true;
-                    lifter.setTargetPosition(4200);
-                    lifter.setPower(0.5);
-                    boom.setTargetPosition(10);//2600
-                    boom.setPower(0.45);
-                }
-
-
-  */
-
-            /**/
-            //Macanum drive section
-
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial = -gamepad1.left_stick_y * halfPower;  // Note: pushing stick forward gives negative value
-            double lateral = gamepad1.left_stick_x * halfPower; // gamepad1.left_stick_x;
-            double yaw = gamepad1.right_stick_x * halfPower; //gamepad1.right_stick_x;
-
-
-            // Combine the joystick requests for each axis-motion to determine each wheel's power.
-            // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower = axial + lateral + yaw;
-            double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower = axial - lateral + yaw;
-            double rightBackPower = axial + lateral - yaw;
-
-            // Normalize the values so no wheel power exceeds 100%
-            // This ensures that the robot maintains the desired motion.
-            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-            max = Math.max(max, Math.abs(leftBackPower));
-            max = Math.max(max, Math.abs(rightBackPower));
-
-            if (max > 1.0) {
-                leftFrontPower /= max;
-                rightFrontPower /= max;
-                leftBackPower /= max;
-                rightBackPower /= max;
-            }
-
-            // This is test code:
-            //
-            // Uncomment the following code to test your motor directions.
-            // Each button should make the corresponding motor run FORWARD.
-            //   1) First get all the motors to take to correct positions on the robot
-            //      by adjusting your Robot Configuration if necessary.
-            //   2) Then make sure they run in the correct direction by modifying the
-            //      the setDirection() calls above.
-            // Once the correct motors move in the correct direction re-comment this code.
-
-                /*
-                leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
-                leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
-                rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
-                rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
-                */
-
-                /*
-                wireless:
-                1. turn robot on
-                2. connect to robot wifi
-                3. open REV Hardware Client
-                4. something about control hubs should appear instead of medium phone API
-                5. press the green play button (it might be a bent arrow shape)
-                 */
-
-
-            // Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-
-            // Show the elapsed game time and wheel power.
-            //    telemetry.addData("Status", "Run Time: " + runtime.toString());
-            //    telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-            //    telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            telemetry.update();
         }
-    }}
+    }
+
 
 

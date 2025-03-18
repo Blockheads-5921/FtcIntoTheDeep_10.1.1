@@ -66,16 +66,16 @@ public final class MecanumDrive {
         // drive model parameters
         public double inPerTick = 0.00198150;
         public double lateralInPerTick = inPerTick;
-        public double trackWidthTicks = 7272.263880518343;
+        public double trackWidthTicks = 7781.092545366853;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.14134;
-        public double kV = 0.000286;
+        public double kS = 1.582456607573243;
+        public double kV = 0.00013;//0.0002640958234182236;
         public double kA = 0.00007;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 60;
-        public double minProfileAccel = -50;
+        public double minProfileAccel = -15; //-50
         public double maxProfileAccel = 60;
 
         // turn profile parameters (in radians)
@@ -85,11 +85,11 @@ public final class MecanumDrive {
         // path controller gains
         public double axialGain = 13.0;
         public double lateralGain = 13.0;
-        public double headingGain = 5.0; // shared with turn
+        public double headingGain = 3;//5.0; // shared with turn
 
-        public double axialVelGain = 3.0;
-        public double lateralVelGain = 3.0;
-        public double headingVelGain = 1.0; // shared with turn
+        public double axialVelGain = 0;//3.0;
+        public double lateralVelGain = 0;//3.0;
+        public double headingVelGain = 0;//1.0; // shared with turn
     }
 
     public static Params PARAMS = new Params();
@@ -141,6 +141,7 @@ public final class MecanumDrive {
 
             // TODO: reverse encoders if needed
             //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+            //rightBack.setDirection(DcMotor.Direction.REVERSE);
         }
 
         @Override
@@ -175,6 +176,7 @@ public final class MecanumDrive {
 
             double headingDelta = heading.minus(lastHeading);
             Twist2dDual<Time> twist = kinematics.forward(new MecanumKinematics.WheelIncrements<>(
+
                     new DualNum<Time>(new double[]{
                             (leftFrontPosVel.position - lastLeftFrontPos),
                             leftFrontPosVel.velocity,
@@ -213,7 +215,7 @@ public final class MecanumDrive {
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
-            if(!module.isParent()) {
+            if (!module.isParent()) {
                 module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
             }
         }
@@ -234,7 +236,7 @@ public final class MecanumDrive {
         //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD); //##PY added 4 lines
         leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
